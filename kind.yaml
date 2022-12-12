@@ -1,0 +1,20 @@
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: castopod
+nodes:
+  - role: control-plane
+    image: kindest/node:v1.25.3
+    extraPortMappings:
+      - containerPort: 30080
+        hostPort: 80
+        protocol: TCP
+      - containerPort: 30443
+        hostPort: 443
+        protocol: TCP
+      - containerPort: 30090
+        hostPort: 9000
+        protocol: TCP
+  - role: worker
+    image: kindest/node:v1.25.3
+  - role: worker
+    image: kindest/node:v1.25.3

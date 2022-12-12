@@ -1,0 +1,42 @@
+apiVersion: castopod.kopilote.io/v1beta1
+kind: Configuration
+metadata:
+  name: default
+spec:
+  mysql:
+    host: mysql.deps.svc
+    port: 3306
+    username: root
+    password: secretpassword
+  ingress:
+    annotations:
+      traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
+---
+apiVersion: castopod.kopilote.io/v1beta1
+kind: Version
+metadata:
+  name: default
+spec:
+  imageTag: 1.1.1
+---
+apiVersion: castopod.kopilote.io/v1beta1
+kind: Castopod
+metadata:
+  name: example
+spec:
+  configurationSpec: default
+  versionSpec: default
+
+  activated: false
+  config:
+    url:
+      base: castopod.192.168.1.3.nip.io
+      media: castopod.192.168.1.3.nip.io
+      legalNotice: castopod.192.168.1.3.nip.io
+    limit:
+      storage: 100
+      bandwidth: 100
+    gateway:
+      admin: /admin
+      auth: /auth
+      install: /install

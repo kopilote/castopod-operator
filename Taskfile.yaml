@@ -1,0 +1,30 @@
+# https://taskfile.dev
+
+version: '3'
+
+tasks:
+  tests:
+    cmds:
+      - make test
+
+  local:destroy:
+    cmds:
+      - kind delete cluster --name castopod
+
+  local:install:
+    cmds:
+      - kind create cluster --config ./kind.yaml
+#      - task: local:deps:traefik
+      - task: local:deps:mysql
+      - kubectl create ns system
+
+  local:deps:traefik:
+    cmds:
+      - helm upgrade traefik traefik/traefik --namespace deps --create-namespace --install --set dashboard.enabled=true
+  local:deps:mysql:
+    cmds:
+      - helm upgrade mysql bitnami/mysql --namespace deps --create-namespace --install --set auth.rootPassword=secretpassword,auth.database=app,metrics.enabled=true
+
+  local:
+    cmds:
+      - make local

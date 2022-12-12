@@ -1,0 +1,17 @@
+domain: kopilote.io
+layout:
+- go.kubebuilder.io/v4-alpha
+multigroup: true
+projectName: operator
+repo: github.com/kopilote/castopod-operator
+resources:
+- api:
+    crdVersion: v1
+    namespaced: false
+  controller: true
+  domain: kopilote.io
+  group: castopod
+  kind: Castopod
+  path: github.com/kopilote/castopod-operator/apis/castopod/v1beta1
+  version: v1beta1
+version: "3"
