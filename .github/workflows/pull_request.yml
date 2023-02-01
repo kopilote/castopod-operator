@@ -1,0 +1,38 @@
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [ assigned, opened, synchronize, reopened ]
+
+name: Pull Request
+jobs:
+  Pr:
+    if: github.event_name == 'pull_request'
+    uses: formancehq/gh-workflows/.github/workflows/pr-style.yml@main
+
+  Lint:
+    uses: formancehq/gh-workflows/.github/workflows/golang-lint.yml@main
+
+#  Test:
+#    name: Test
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Install task
+#        uses: arduino/setup-task@v1
+#      - uses: actions/checkout@v3
+#      - uses: actions/setup-go@v3
+#        with:
+#          go-version-file: 'go.mod'
+#          cache: true
+#      - name: Run tests
+#        uses: nick-fields/retry@v2
+#        with:
+#          timeout_minutes: 10
+#          max_attempts: 3
+#          command: task tests
+#      - name: Upload coverage to Codecov
+#        uses: codecov/codecov-action@v3
+#        with:
+#          fail_ci_if_error: false # optional (default = false)
+#          verbose: true # optional (default = false)
