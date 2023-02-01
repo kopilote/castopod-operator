@@ -57,7 +57,7 @@ spec:
       #             values:
       #               - linux
       securityContext:
-        runAsNonRoot: true
+        runAsNonRoot: false
         # TODO(user): For common cases that do not require escalating privileges
         # it is recommended to ensure that all your Pods/Containers are restrictive.
         # More info: https://kubernetes.io/docs/concepts/security/pod-security-standards/#restricted
@@ -70,7 +70,7 @@ spec:
         - /usr/bin/operator
         args:
         - --leader-elect
-        image: ghcr.io/kopilote/castopod-operator:v1.0.0 # {"$imagepolicy": "kopilote-system:castopod-operator"}
+        image: ghcr.io/kopilote/castopod-operator:v1.0.2 # {"$imagepolicy": "kopilote-system:castopod-operator"}
         name: manager
         securityContext:
           allowPrivilegeEscalation: false
