@@ -28,3 +28,4 @@ Dockerfile.cross
 .garden
 .terraform
 cover.out
+dist

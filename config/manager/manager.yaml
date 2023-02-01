@@ -67,7 +67,7 @@ spec:
         #   type: RuntimeDefault
       containers:
       - command:
-        - /manager
+        - /usr/bin/operator
         args:
         - --leader-elect
         image: ghcr.io/kopilote/castopod-operator:v1.0.0 # {"$imagepolicy": "kopilote-system:castopod-operator"}

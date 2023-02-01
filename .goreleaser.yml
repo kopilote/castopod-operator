@@ -1,7 +1,7 @@
 project_name: castopod-operator
 
 builds:
-  - binary: castopod-operator
+  - binary: operator
     id: castopod-operator
     ldflags:
       - -X github.com/kopilote/castopod-operator/cmd.BuildDate={{ .Date }}
