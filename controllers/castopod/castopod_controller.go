@@ -190,8 +190,9 @@ func (r *CastopodMutator) reconcileDeploymentForApp(ctx context.Context, config 
 				Spec: corev1.PodSpec{
 					Containers: []corev1.Container{
 						{
-							Name:            "web",
-							Image:           fmt.Sprintf("castopod/web-server:%s", config.Version.Spec.ImageTag),
+							Name:  "web",
+							Image: fmt.Sprintf("castopod/castopod:%s", "develop"),
+							//Image:           fmt.Sprintf("castopod/castopod:%s", config.Version.Spec.ImageTag),
 							ImagePullPolicy: corev1.PullIfNotPresent,
 							Env:             generateEnv(*config),
 							Ports: []corev1.ContainerPort{{
@@ -199,30 +200,6 @@ func (r *CastopodMutator) reconcileDeploymentForApp(ctx context.Context, config 
 								ContainerPort: 80,
 							}},
 							LivenessProbe: controllerutils.DefaultLiveness(),
-							Resources: corev1.ResourceRequirements{
-								Requests: corev1.ResourceList{
-									corev1.ResourceCPU:    *resource.NewMilliQuantity(100, resource.DecimalSI),
-									corev1.ResourceMemory: *resource.NewMilliQuantity(256, resource.DecimalSI),
-								},
-							},
-						},
-						{
-							Name:            "app",
-							Image:           fmt.Sprintf("castopod/app:%s", config.Version.Spec.ImageTag),
-							ImagePullPolicy: corev1.PullIfNotPresent,
-							Env:             generateEnv(*config),
-							Resources: corev1.ResourceRequirements{
-								Requests: corev1.ResourceList{
-									corev1.ResourceCPU:    *resource.NewMilliQuantity(100, resource.DecimalSI),
-									corev1.ResourceMemory: *resource.NewMilliQuantity(256, resource.DecimalSI),
-								},
-							},
-						},
-						{
-							Name:            "video-clipper",
-							Image:           fmt.Sprintf("castopod/video-clipper:%s", config.Version.Spec.ImageTag),
-							ImagePullPolicy: corev1.PullIfNotPresent,
-							Env:             generateEnv(*config),
 							Resources: corev1.ResourceRequirements{
 								Requests: corev1.ResourceList{
 									corev1.ResourceCPU:    *resource.NewMilliQuantity(100, resource.DecimalSI),
