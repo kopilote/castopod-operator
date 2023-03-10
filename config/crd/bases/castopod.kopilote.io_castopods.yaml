@@ -19,6 +19,9 @@ spec:
     - jsonPath: .spec.activated
       name: Activated
       type: boolean
+    - jsonPath: .spec.config.url.base
+      name: Host
+      type: string
     - jsonPath: .spec.configurationSpec
       name: Configuration
       type: string

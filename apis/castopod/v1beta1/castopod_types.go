@@ -64,6 +64,7 @@ type ConfigGateway struct {
 //+kubebuilder:subresource:status
 //+kubebuilder:resource:scope=Cluster
 //+kubebuilder:printcolumn:name="Activated",type=boolean,JSONPath=`.spec.activated`
+//+kubebuilder:printcolumn:name="Host",type=string,JSONPath=`.spec.config.url.base`
 //+kubebuilder:printcolumn:name="Configuration",type=string,JSONPath=`.spec.configurationSpec`
 //+kubebuilder:printcolumn:name="Version",type=string,JSONPath=`.spec.versionSpec`
 
