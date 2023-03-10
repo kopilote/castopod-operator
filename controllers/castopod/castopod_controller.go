@@ -190,9 +190,8 @@ func (r *CastopodMutator) reconcileDeploymentForApp(ctx context.Context, config 
 				Spec: corev1.PodSpec{
 					Containers: []corev1.Container{
 						{
-							Name:  "web",
-							Image: fmt.Sprintf("castopod/castopod:%s", "develop"),
-							//Image:           fmt.Sprintf("castopod/castopod:%s", config.Version.Spec.ImageTag),
+							Name:            "web",
+							Image:           fmt.Sprintf("castopod/castopod:%s", config.Version.Spec.ImageTag),
 							ImagePullPolicy: corev1.PullIfNotPresent,
 							Env:             generateEnv(*config),
 							Ports: []corev1.ContainerPort{{
