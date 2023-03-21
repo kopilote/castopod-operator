@@ -209,8 +209,8 @@ func (r *CastopodMutator) reconcileDeploymentForApp(ctx context.Context, config 
 							ImagePullPolicy: corev1.PullIfNotPresent,
 							Env:             generateEnv(*config),
 							Ports: []corev1.ContainerPort{{
-								Name:          "castopod",
-								ContainerPort: 80,
+								Name:          "http",
+								ContainerPort: 8000,
 							}},
 							LivenessProbe: controllerutils.DefaultLiveness(),
 							Resources: corev1.ResourceRequirements{
