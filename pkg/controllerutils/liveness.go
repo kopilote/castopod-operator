@@ -10,7 +10,7 @@ func DefaultLiveness() *corev1.Probe {
 	return &corev1.Probe{
 		ProbeHandler: corev1.ProbeHandler{
 			HTTPGet: &corev1.HTTPGetAction{
-				Path: "/",
+				Path: "/health",
 				Port: intstr.IntOrString{
 					IntVal: 8000,
 				},
