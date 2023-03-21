@@ -129,20 +129,34 @@ func (r *CastopodMutator) Mutate(ctx context.Context, app *v1beta1.Castopod) (*c
 
 func generateEnv(config config) []corev1.EnvVar {
 	env := []corev1.EnvVar{
+		apisv1beta1.Env("app.baseURL", fmt.Sprintf("https://%s", config.App.Spec.Config.URL.Base)),
+		apisv1beta1.Env("media.baseURL", fmt.Sprintf("https://%s", config.App.Spec.Config.URL.Media)),
+		apisv1beta1.Env("admin.gateway", config.App.Spec.Config.Gateway.Admin),
+		apisv1beta1.Env("auth.gateway", config.App.Spec.Config.Gateway.Auth),
+
+		// Config for S3
+		apisv1beta1.Env("media.fileManager", "s3"),
+		apisv1beta1.Env("media.s3.endpoint", config.App.Spec.Config.Media.Endpoint),
+		apisv1beta1.Env("media.s3.key", config.App.Spec.Config.Media.Key),
+		apisv1beta1.Env("media.s3.secret", config.App.Spec.Config.Media.Secret),
+		apisv1beta1.Env("media.s3.region", config.App.Spec.Config.Media.Region),
+
+		// Config for SMTP
+		apisv1beta1.Env("email.fromEmail", config.App.Spec.Config.Smtp.From),
+		apisv1beta1.Env("email.SMTPHost", config.App.Spec.Config.Smtp.Host),
+		apisv1beta1.Env("email.SMTPPort", string(config.App.Spec.Config.Smtp.Port)),
+		apisv1beta1.Env("email.SMTPUser", config.App.Spec.Config.Smtp.Username),
+		apisv1beta1.Env("email.SMTPPass", config.App.Spec.Config.Smtp.Password),
+
 		apisv1beta1.Env("CP_CACHE_HANDLER", "file"),
-		apisv1beta1.Env("CP_APP_HOSTNAME", "localhost"),
 		apisv1beta1.Env("CP_ANALYTICS_SALT", b64.StdEncoding.EncodeToString([]byte(config.App.Name))),
 		apisv1beta1.Env("CP_DATABASE_NAME", fmt.Sprintf("castopod_%s", config.App.Name)),
 		// URL
-		apisv1beta1.Env("CP_BASEURL", fmt.Sprintf("https://%s", config.App.Spec.Config.URL.Base)),
-		apisv1beta1.Env("CP_MEDIA_BASEURL", fmt.Sprintf("https://%s", config.App.Spec.Config.URL.Media)),
 		apisv1beta1.Env("CP_LEGALNOTICE_BASEURL", fmt.Sprintf("https://%s", config.App.Spec.Config.URL.LegalNotice)),
 		// Limit
 		apisv1beta1.Env("CP_LIMIT_STORAGE", fmt.Sprintf("%d", config.App.Spec.Config.Limit.Storage)),
 		apisv1beta1.Env("CP_LIMIT_BANDWIDTH", fmt.Sprintf("%d", config.App.Spec.Config.Limit.Bandwidth)),
 		// Gateway
-		apisv1beta1.Env("CP_ADMIN_GATEWAY", config.App.Spec.Config.Gateway.Admin),
-		apisv1beta1.Env("CP_AUTH_GATEWAY", config.App.Spec.Config.Gateway.Auth),
 		apisv1beta1.Env("CP_INSTALL_GATEWAY", config.App.Spec.Config.Gateway.Install),
 		// SMTP TODO: Add SMTP env vars
 	}

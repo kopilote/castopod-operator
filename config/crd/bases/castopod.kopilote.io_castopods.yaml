@@ -70,6 +70,30 @@ spec:
                         format: int64
                         type: integer
                     type: object
+                  media:
+                    properties:
+                      endpoint:
+                        type: string
+                      key:
+                        type: string
+                      region:
+                        type: string
+                      secret:
+                        type: string
+                    type: object
+                  smtp:
+                    properties:
+                      from:
+                        type: string
+                      host:
+                        type: string
+                      password:
+                        type: string
+                      port:
+                        type: integer
+                      username:
+                        type: string
+                    type: object
                   url:
                     properties:
                       base:
