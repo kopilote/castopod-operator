@@ -90,6 +90,7 @@ spec:
                       password:
                         type: string
                       port:
+                        format: int32
                         type: integer
                       username:
                         type: string
