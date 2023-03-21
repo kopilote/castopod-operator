@@ -41,25 +41,6 @@ type Config struct {
 	URL     ConfigUrl     `json:"url,omitempty"`
 	Limit   ConfigLimit   `json:"limit,omitempty"`
 	Gateway ConfigGateway `json:"gateway,omitempty"`
-	Media   ConfigMedia   `json:"media,omitempty"`
-	Smtp    ConfigSmtp    `json:"smtp,omitempty"`
-}
-
-type ConfigSmtp struct {
-	//+optional
-	From     string `json:"from,omitempty"`
-	Host     string `json:"host,omitempty"`
-	Port     int32  `json:"port,omitempty"`
-	Username string `json:"username,omitempty"`
-	Password string `json:"password,omitempty"`
-}
-
-type ConfigMedia struct {
-	//+optional
-	Endpoint string `json:"endpoint,omitempty"`
-	Key      string `json:"key,omitempty"`
-	Secret   string `json:"secret,omitempty"`
-	Region   string `json:"region,omitempty"`
 }
 
 type ConfigUrl struct {

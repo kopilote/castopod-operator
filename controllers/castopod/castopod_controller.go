@@ -136,17 +136,17 @@ func generateEnv(config config) []corev1.EnvVar {
 
 		// Config for S3
 		apisv1beta1.Env("media.fileManager", "s3"),
-		apisv1beta1.Env("media.s3.endpoint", config.App.Spec.Config.Media.Endpoint),
-		apisv1beta1.Env("media.s3.key", config.App.Spec.Config.Media.Key),
-		apisv1beta1.Env("media.s3.secret", config.App.Spec.Config.Media.Secret),
-		apisv1beta1.Env("media.s3.region", config.App.Spec.Config.Media.Region),
+		apisv1beta1.Env("media.s3.endpoint", config.Configuration.Spec.Media.Endpoint),
+		apisv1beta1.Env("media.s3.key", config.Configuration.Spec.Media.Key),
+		apisv1beta1.Env("media.s3.secret", config.Configuration.Spec.Media.Secret),
+		apisv1beta1.Env("media.s3.region", config.Configuration.Spec.Media.Region),
 
 		// Config for SMTP
-		apisv1beta1.Env("email.fromEmail", config.App.Spec.Config.Smtp.From),
-		apisv1beta1.Env("email.SMTPHost", config.App.Spec.Config.Smtp.Host),
-		apisv1beta1.Env("email.SMTPPort", string(config.App.Spec.Config.Smtp.Port)),
-		apisv1beta1.Env("email.SMTPUser", config.App.Spec.Config.Smtp.Username),
-		apisv1beta1.Env("email.SMTPPass", config.App.Spec.Config.Smtp.Password),
+		apisv1beta1.Env("email.fromEmail", config.Configuration.Spec.Smtp.From),
+		apisv1beta1.Env("email.SMTPHost", config.Configuration.Spec.Smtp.Host),
+		apisv1beta1.Env("email.SMTPPort", string(config.Configuration.Spec.Smtp.Port)),
+		apisv1beta1.Env("email.SMTPUser", config.Configuration.Spec.Smtp.Username),
+		apisv1beta1.Env("email.SMTPPass", config.Configuration.Spec.Smtp.Password),
 
 		apisv1beta1.Env("CP_CACHE_HANDLER", "file"),
 		apisv1beta1.Env("CP_ANALYTICS_SALT", b64.StdEncoding.EncodeToString([]byte(config.App.Name))),

@@ -53,6 +53,17 @@ spec:
                         type: string
                     type: object
                 type: object
+              media:
+                properties:
+                  endpoint:
+                    type: string
+                  key:
+                    type: string
+                  region:
+                    type: string
+                  secret:
+                    type: string
+                type: object
               mysql:
                 properties:
                   host:
@@ -223,6 +234,20 @@ spec:
                         type: object
                         x-kubernetes-map-type: atomic
                     type: object
+                type: object
+              smtp:
+                properties:
+                  from:
+                    type: string
+                  host:
+                    type: string
+                  password:
+                    type: string
+                  port:
+                    format: int32
+                    type: integer
+                  username:
+                    type: string
                 type: object
             required:
             - mysql
