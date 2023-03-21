@@ -21,6 +21,8 @@ import (
 	b64 "encoding/base64"
 	"fmt"
 
+	certmanager "github.com/cert-manager/cert-manager/pkg/apis/certmanager/v1"
+	cmmeta "github.com/cert-manager/cert-manager/pkg/apis/meta/v1"
 	"github.com/kopilote/castopod-operator/apis/castopod/v1beta1"
 	apisv1beta1 "github.com/kopilote/castopod-operator/pkg/apis/v1beta1"
 	"github.com/kopilote/castopod-operator/pkg/controllerutils"
@@ -301,7 +303,14 @@ func (r *CastopodMutator) reconcileIngressForApp(ctx context.Context, config *co
 		pathType := networkingv1.PathTypePrefix
 		ingress.ObjectMeta.Annotations = annotations
 		ingress.Spec = networkingv1.IngressSpec{
-			TLS: config.Configuration.Spec.Ingress.TLS.AsK8SIngressTLSSlice(),
+			TLS: []networkingv1.IngressTLS{
+				{
+					Hosts: []string{
+						config.App.Spec.Config.URL.Base,
+					},
+					SecretName: config.App.Name,
+				},
+			},
 			Rules: []networkingv1.IngressRule{
 				{
 					Host: config.App.Spec.Config.URL.Base,
@@ -335,6 +344,32 @@ func (r *CastopodMutator) reconcileIngressForApp(ctx context.Context, config *co
 	case operationResult == controllerutil.OperationResultNone:
 	default:
 		apisv1beta1.SetIngressReady(config.App)
+	}
+	return ret, nil
+}
+
+func (r *CastopodMutator) reconcileCertificate(ctx context.Context, config *config) (*certmanager.Certificate, error) {
+	ret, operationResult, err := controllerutils.CreateOrUpdateWithController(ctx, r.Client, r.Scheme, types.NamespacedName{
+		Namespace: config.App.Namespace,
+		Name:      config.App.Name,
+	}, config.App, func(certificate *certmanager.Certificate) error {
+		certificate.Spec = certmanager.CertificateSpec{
+			DNSNames:   []string{config.App.Spec.Config.URL.Base},
+			SecretName: config.App.Name,
+			IssuerRef: cmmeta.ObjectReference{
+				Name: "dns-letsencrypt-prod",
+				Kind: "Issuer",
+			},
+		}
+		return nil
+	})
+	switch {
+	case err != nil:
+		apisv1beta1.SetCertificateError(config.App, err.Error())
+		return nil, err
+	case operationResult == controllerutil.OperationResultNone:
+	default:
+		apisv1beta1.SetCertificateReady(config.App)
 	}
 	return ret, nil
 }
