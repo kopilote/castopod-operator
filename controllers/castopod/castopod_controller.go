@@ -144,7 +144,7 @@ func generateEnv(config config) []corev1.EnvVar {
 		// Config for SMTP
 		apisv1beta1.Env("email.fromEmail", config.Configuration.Spec.Smtp.From),
 		apisv1beta1.Env("email.SMTPHost", config.Configuration.Spec.Smtp.Host),
-		apisv1beta1.Env("email.SMTPPort", string(config.Configuration.Spec.Smtp.Port)),
+		apisv1beta1.Env("email.SMTPPort", config.Configuration.Spec.Smtp.Port),
 		apisv1beta1.Env("email.SMTPUser", config.Configuration.Spec.Smtp.Username),
 		apisv1beta1.Env("email.SMTPPass", config.Configuration.Spec.Smtp.Password),
 

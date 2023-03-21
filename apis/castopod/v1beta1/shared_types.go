@@ -82,7 +82,7 @@ func SelectRequiredConfigValueOrReference[VALUE interface {
 
 type MysqlConfig struct {
 	// +optional
-	Port int `json:"port"`
+	Port string `json:"port"`
 	// +optional
 	PortFrom *ConfigSource `json:"portFrom"`
 	// +optional

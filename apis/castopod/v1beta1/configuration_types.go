@@ -40,7 +40,7 @@ type ConfigSmtp struct {
 	//+optional
 	From     string `json:"from,omitempty"`
 	Host     string `json:"host,omitempty"`
-	Port     int32  `json:"port,omitempty"`
+	Port     string `json:"port,omitempty"`
 	Username string `json:"username,omitempty"`
 	Password string `json:"password,omitempty"`
 }
