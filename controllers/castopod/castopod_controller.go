@@ -130,23 +130,23 @@ func (r *CastopodMutator) Mutate(ctx context.Context, app *v1beta1.Castopod) (*c
 func generateEnv(config config) []corev1.EnvVar {
 	env := []corev1.EnvVar{
 		apisv1beta1.Env("CP_BASEURL", fmt.Sprintf("https://%s", config.App.Spec.Config.URL.Base)),
-		apisv1beta1.Env("media.baseURL", fmt.Sprintf("https://%s", config.App.Spec.Config.URL.Media)),
-		apisv1beta1.Env("admin.gateway", config.App.Spec.Config.Gateway.Admin),
-		apisv1beta1.Env("auth.gateway", config.App.Spec.Config.Gateway.Auth),
+		apisv1beta1.Env("media_baseURL", fmt.Sprintf("https://%s", config.App.Spec.Config.URL.Media)),
+		apisv1beta1.Env("admin_gateway", config.App.Spec.Config.Gateway.Admin),
+		apisv1beta1.Env("auth_gateway", config.App.Spec.Config.Gateway.Auth),
 
 		// Config for S3
-		apisv1beta1.Env("media.fileManager", "s3"),
-		apisv1beta1.Env("media.s3.endpoint", config.Configuration.Spec.Media.Endpoint),
-		apisv1beta1.Env("media.s3.key", config.Configuration.Spec.Media.Key),
-		apisv1beta1.Env("media.s3.secret", config.Configuration.Spec.Media.Secret),
-		apisv1beta1.Env("media.s3.region", config.Configuration.Spec.Media.Region),
+		apisv1beta1.Env("media_fileManager", "s3"),
+		apisv1beta1.Env("media_s3_endpoint", config.Configuration.Spec.Media.Endpoint),
+		apisv1beta1.Env("media_s3_key", config.Configuration.Spec.Media.Key),
+		apisv1beta1.Env("media_s3_secret", config.Configuration.Spec.Media.Secret),
+		apisv1beta1.Env("media_s3_region", config.Configuration.Spec.Media.Region),
 
 		// Config for SMTP
-		apisv1beta1.Env("email.fromEmail", config.Configuration.Spec.Smtp.From),
-		apisv1beta1.Env("email.SMTPHost", config.Configuration.Spec.Smtp.Host),
-		apisv1beta1.Env("email.SMTPPort", config.Configuration.Spec.Smtp.Port),
-		apisv1beta1.Env("email.SMTPUser", config.Configuration.Spec.Smtp.Username),
-		apisv1beta1.Env("email.SMTPPass", config.Configuration.Spec.Smtp.Password),
+		apisv1beta1.Env("email_fromEmail", config.Configuration.Spec.Smtp.From),
+		apisv1beta1.Env("email_SMTPHost", config.Configuration.Spec.Smtp.Host),
+		apisv1beta1.Env("email_SMTPPort", config.Configuration.Spec.Smtp.Port),
+		apisv1beta1.Env("email_SMTPUser", config.Configuration.Spec.Smtp.Username),
+		apisv1beta1.Env("email_SMTPPass", config.Configuration.Spec.Smtp.Password),
 
 		apisv1beta1.Env("CP_CACHE_HANDLER", "file"),
 		apisv1beta1.Env("CP_ANALYTICS_SALT", b64.StdEncoding.EncodeToString([]byte(config.App.Name))),

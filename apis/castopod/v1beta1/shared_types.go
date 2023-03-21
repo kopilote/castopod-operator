@@ -112,7 +112,7 @@ func (c *MysqlConfig) EnvWithDiscriminator(prefix, discriminator string) []corev
 	ret := make([]corev1.EnvVar, 0)
 	ret = append(ret, SelectRequiredConfigValueOrReference(withDiscriminator("CP_DATABASE_HOSTNAME"), prefix, c.Host, c.HostFrom))
 	ret = append(ret, SelectRequiredConfigValueOrReference(withDiscriminator("CP_DATABASE_PORT"), prefix, c.Port, c.PortFrom))
-	ret = append(ret, SelectRequiredConfigValueOrReference(withDiscriminator("database.default.port"), prefix, c.Port, c.PortFrom))
+	ret = append(ret, SelectRequiredConfigValueOrReference(withDiscriminator("database_default_port"), prefix, c.Port, c.PortFrom))
 	ret = append(ret, SelectRequiredConfigValueOrReference(withDiscriminator("CP_DATABASE_USERNAME"), prefix, c.Username, c.UsernameFrom))
 	ret = append(ret, SelectRequiredConfigValueOrReference(withDiscriminator("CP_DATABASE_PASSWORD"), prefix, c.Password, c.PasswordFrom))
 
