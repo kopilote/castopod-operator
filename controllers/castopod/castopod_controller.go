@@ -124,6 +124,7 @@ func (r *CastopodMutator) Mutate(ctx context.Context, app *v1beta1.Castopod) (*c
 		return controllerutils.Requeue(), pkgError.Wrap(err, "Reconciling ingress for Castopod")
 	}
 
+	// TODO: Send Webhooks when Castopod is ready
 	apisv1beta1.SetReady(app)
 	return nil, nil
 
@@ -142,6 +143,7 @@ func generateEnv(config config) []corev1.EnvVar {
 		apisv1beta1.Env("media_s3_key", config.Configuration.Spec.Media.Key),
 		apisv1beta1.Env("media_s3_secret", config.Configuration.Spec.Media.Secret),
 		apisv1beta1.Env("media_s3_region", config.Configuration.Spec.Media.Region),
+		apisv1beta1.Env("media.s3.keyPrefix", config.App.Name),
 
 		// Config for SMTP
 		apisv1beta1.Env("email_fromEmail", config.Configuration.Spec.Smtp.From),
