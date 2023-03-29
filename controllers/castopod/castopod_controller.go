@@ -136,6 +136,7 @@ func generateEnv(config config) []corev1.EnvVar {
 		apisv1beta1.Env("media_baseURL", fmt.Sprintf("https://%s", config.App.Spec.Config.URL.Media)),
 		apisv1beta1.Env("admin_gateway", config.App.Spec.Config.Gateway.Admin),
 		apisv1beta1.Env("auth_gateway", config.App.Spec.Config.Gateway.Auth),
+		apisv1beta1.Env("install_gateway", config.App.Spec.Config.Gateway.Install),
 
 		// Config for S3
 		apisv1beta1.Env("media_fileManager", "s3"),
@@ -160,9 +161,6 @@ func generateEnv(config config) []corev1.EnvVar {
 		// Limit
 		apisv1beta1.Env("CP_LIMIT_STORAGE", fmt.Sprintf("%d", config.App.Spec.Config.Limit.Storage)),
 		apisv1beta1.Env("CP_LIMIT_BANDWIDTH", fmt.Sprintf("%d", config.App.Spec.Config.Limit.Bandwidth)),
-		// Gateway
-		apisv1beta1.Env("CP_INSTALL_GATEWAY", config.App.Spec.Config.Gateway.Install),
-		// SMTP TODO: Add SMTP env vars
 	}
 	env = append(env, config.Configuration.Spec.Mysql.Env("")...)
 	return env
