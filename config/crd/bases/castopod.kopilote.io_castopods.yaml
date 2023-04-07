@@ -64,10 +64,10 @@ spec:
                   limit:
                     properties:
                       bandwidth:
-                        format: int64
+                        format: int32
                         type: integer
                       storage:
-                        format: int64
+                        format: int32
                         type: integer
                     type: object
                   url:
