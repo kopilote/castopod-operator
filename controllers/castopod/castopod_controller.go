@@ -159,8 +159,8 @@ func generateEnv(config config) []corev1.EnvVar {
 		// URL
 		apisv1beta1.Env("CP_LEGALNOTICE_BASEURL", fmt.Sprintf("https://%s", config.App.Spec.Config.URL.LegalNotice)),
 		// Limit
-		apisv1beta1.Env("CP_LIMIT_STORAGE", config.App.Spec.Config.Limit.Storage),
-		apisv1beta1.Env("CP_LIMIT_BANDWIDTH", config.App.Spec.Config.Limit.Bandwidth),
+		apisv1beta1.Env("CP_LIMIT_STORAGE", fmt.Sprintf("%s", config.App.Spec.Config.Limit.Storage)),
+		apisv1beta1.Env("CP_LIMIT_BANDWIDTH", fmt.Sprintf("%s", config.App.Spec.Config.Limit.Bandwidth)),
 	}
 	env = append(env, config.Configuration.Spec.Mysql.Env("")...)
 	return env
