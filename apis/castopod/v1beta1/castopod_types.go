@@ -50,8 +50,8 @@ type ConfigUrl struct {
 }
 
 type ConfigLimit struct {
-	Storage   int32 `json:"storage,omitempty"`
-	Bandwidth int32 `json:"bandwidth,omitempty"`
+	Storage   string `json:"storage,omitempty"`
+	Bandwidth string `json:"bandwidth,omitempty"`
 }
 
 type ConfigGateway struct {
