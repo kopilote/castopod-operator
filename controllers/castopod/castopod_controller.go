@@ -144,7 +144,8 @@ func generateEnv(config config) []corev1.EnvVar {
 		apisv1beta1.Env("media_s3_key", config.Configuration.Spec.Media.Key),
 		apisv1beta1.Env("media_s3_secret", config.Configuration.Spec.Media.Secret),
 		apisv1beta1.Env("media_s3_region", config.Configuration.Spec.Media.Region),
-		apisv1beta1.Env("media.s3.keyPrefix", config.App.Name),
+		apisv1beta1.Env("media_s3_bucket", config.Configuration.Spec.Media.Bucket),
+		apisv1beta1.Env("media_s3_keyPrefix", config.App.Name),
 
 		// Config for SMTP
 		apisv1beta1.Env("email_fromEmail", config.Configuration.Spec.Smtp.From),

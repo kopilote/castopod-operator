@@ -51,6 +51,7 @@ type ConfigMedia struct {
 	Key      string `json:"key,omitempty"`
 	Secret   string `json:"secret,omitempty"`
 	Region   string `json:"region,omitempty"`
+	Bucket   string `json:"bucket,omitempty"`
 }
 
 //+kubebuilder:object:root=true
