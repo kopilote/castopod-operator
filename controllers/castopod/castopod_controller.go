@@ -227,7 +227,7 @@ func (r *CastopodMutator) reconcileDeploymentForApp(ctx context.Context, config 
 					InitContainers: []corev1.Container{
 						{
 							Name:            "init-create-db",
-							Image:           "mysql:8",
+							Image:           "mysql:8.0.31",
 							ImagePullPolicy: corev1.PullIfNotPresent,
 							Command: []string{
 								"sh",
