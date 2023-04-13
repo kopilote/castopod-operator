@@ -16,7 +16,8 @@ type IngressSpec struct {
 }
 
 const (
-	ConditionTypeIngressReady = "IngressReady"
+	ConditionTypeIngressReady    = "IngressReady"
+	ConditionTypeIngressCdnReady = "IngressCdnReady"
 )
 
 func SetIngressReady(object Object, msg ...string) {
@@ -25,6 +26,14 @@ func SetIngressReady(object Object, msg ...string) {
 
 func SetIngressError(object Object, msg ...string) {
 	SetCondition(object, ConditionTypeIngressReady, metav1.ConditionFalse, msg...)
+}
+
+func SetIngressCdnReady(object Object, msg ...string) {
+	SetCondition(object, ConditionTypeIngressCdnReady, metav1.ConditionTrue, msg...)
+}
+
+func SetIngressCdnError(object Object, msg ...string) {
+	SetCondition(object, ConditionTypeIngressCdnReady, metav1.ConditionFalse, msg...)
 }
 
 func RemoveIngressCondition(object Object) {

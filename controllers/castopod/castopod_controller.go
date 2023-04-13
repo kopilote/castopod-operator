@@ -119,7 +119,12 @@ func (r *CastopodMutator) Mutate(ctx context.Context, app *v1beta1.Castopod) (*c
 	if err != nil {
 		return controllerutils.Requeue(), pkgError.Wrap(err, "Reconciling service for Castopod")
 	}
+
 	_, err = r.reconcileIngressForApp(ctx, appConfig, castopodService)
+	if err != nil {
+		return controllerutils.Requeue(), pkgError.Wrap(err, "Reconciling ingress for Castopod")
+	}
+	_, err = r.reconcileIngressForCDN(ctx, appConfig, castopodService)
 	if err != nil {
 		return controllerutils.Requeue(), pkgError.Wrap(err, "Reconciling ingress for Castopod")
 	}
@@ -349,6 +354,52 @@ func (r *CastopodMutator) reconcileIngressForApp(ctx context.Context, config *co
 	return ret, nil
 }
 
+func (r *CastopodMutator) reconcileIngressForCDN(ctx context.Context, config *config, service *corev1.Service) (*networkingv1.Ingress, error) {
+	annotations := config.Configuration.Spec.Ingress.Annotations
+	ret, operationResult, err := controllerutils.CreateOrUpdateWithController(ctx, r.Client, r.Scheme, types.NamespacedName{
+		Namespace: config.App.Namespace,
+		Name:      service.Name + "-cdn",
+	}, config.App, func(ingress *networkingv1.Ingress) error {
+		pathType := networkingv1.PathTypePrefix
+		ingress.ObjectMeta.Annotations = annotations
+		ingress.Spec = networkingv1.IngressSpec{
+			Rules: []networkingv1.IngressRule{
+				{
+					Host: config.App.Spec.Config.URL.Media,
+					IngressRuleValue: networkingv1.IngressRuleValue{
+						HTTP: &networkingv1.HTTPIngressRuleValue{
+							Paths: []networkingv1.HTTPIngressPath{
+								{
+									Path:     "/",
+									PathType: &pathType,
+									Backend: networkingv1.IngressBackend{
+										Service: &networkingv1.IngressServiceBackend{
+											Name: service.Name,
+											Port: networkingv1.ServiceBackendPort{
+												Name: service.Spec.Ports[0].Name,
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+		}
+		return nil
+	})
+	switch {
+	case err != nil:
+		apisv1beta1.SetIngressCdnError(config.App, err.Error())
+		return nil, err
+	case operationResult == controllerutil.OperationResultNone:
+	default:
+		apisv1beta1.SetIngressCdnReady(config.App)
+	}
+	return ret, nil
+}
+
 func (r *CastopodMutator) reconcileCertificate(ctx context.Context, config *config) (*certmanager.Certificate, error) {
 	ret, operationResult, err := controllerutils.CreateOrUpdateWithController(ctx, r.Client, r.Scheme, types.NamespacedName{
 		Namespace: config.App.Namespace,
@@ -378,8 +429,12 @@ func (r *CastopodMutator) reconcileCertificate(ctx context.Context, config *conf
 // SetupWithBuilder SetupWithManager sets up the controller with the Manager.
 func (r *CastopodMutator) SetupWithBuilder(mgr ctrl.Manager, builder *ctrl.Builder) error {
 	builder.
+		Owns(&v1beta1.Configuration{}).
+		Owns(&v1beta1.Version{}).
 		Owns(&appsv1.Deployment{}).
-		Owns(&corev1.Service{})
+		Owns(&corev1.Service{}).
+		Owns(&networkingv1.Ingress{}).
+		Owns(&certmanager.Certificate{})
 	return nil
 }
 
