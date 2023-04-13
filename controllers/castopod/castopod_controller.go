@@ -433,8 +433,7 @@ func (r *CastopodMutator) SetupWithBuilder(mgr ctrl.Manager, builder *ctrl.Build
 		Owns(&v1beta1.Version{}).
 		Owns(&appsv1.Deployment{}).
 		Owns(&corev1.Service{}).
-		Owns(&networkingv1.Ingress{}).
-		Owns(&certmanager.Certificate{})
+		Owns(&networkingv1.Ingress{})
 	return nil
 }
 
