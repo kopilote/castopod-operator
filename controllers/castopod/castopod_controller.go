@@ -138,9 +138,9 @@ func (r *CastopodMutator) Mutate(ctx context.Context, app *v1beta1.Castopod) (*c
 func generateEnv(config config) []corev1.EnvVar {
 	env := []corev1.EnvVar{
 		apisv1beta1.Env("CP_BASEURL", fmt.Sprintf("https://%s", config.App.Spec.Config.URL.Base)),
-		apisv1beta1.Env("media_baseURL", fmt.Sprintf("https://%s", config.App.Spec.Config.URL.Media)),
-		apisv1beta1.Env("admin_gateway", config.App.Spec.Config.Gateway.Admin),
-		apisv1beta1.Env("auth_gateway", config.App.Spec.Config.Gateway.Auth),
+		apisv1beta1.Env("CP_MEDIA_BASEURL", fmt.Sprintf("https://%s", config.App.Spec.Config.URL.Media)),
+		apisv1beta1.Env("CP_ADMIN_GATEWAY", config.App.Spec.Config.Gateway.Admin),
+		apisv1beta1.Env("CP_AUTH_GATEWAY", config.App.Spec.Config.Gateway.Auth),
 		apisv1beta1.Env("install_gateway", config.App.Spec.Config.Gateway.Install),
 
 		// Config for S3
