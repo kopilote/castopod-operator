@@ -63,8 +63,6 @@ spec:
                     type: object
                   limit:
                     properties:
-                      bandwidth:
-                        type: string
                       storage:
                         type: string
                     type: object

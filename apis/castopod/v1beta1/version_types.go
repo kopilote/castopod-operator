@@ -43,17 +43,7 @@ type Version struct {
 	Status pkgv1beta1.Status `json:"status,omitempty"`
 }
 
-func (in *Version) IsDirty(t pkgv1beta1.Object) bool {
-	return false
-}
-
-func (in *Version) GetStatus() pkgv1beta1.Dirty {
-	return &in.Status
-}
-
-func (in *Version) GetConditions() *pkgv1beta1.Conditions {
-	return &in.Status.Conditions
-}
+func (*Version) Hub() {}
 
 //+kubebuilder:object:root=true
 

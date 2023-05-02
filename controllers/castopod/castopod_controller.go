@@ -21,11 +21,10 @@ import (
 	b64 "encoding/base64"
 	"fmt"
 
-	certmanager "github.com/cert-manager/cert-manager/pkg/apis/certmanager/v1"
-	cmmeta "github.com/cert-manager/cert-manager/pkg/apis/meta/v1"
 	"github.com/kopilote/castopod-operator/apis/castopod/v1beta1"
 	apisv1beta1 "github.com/kopilote/castopod-operator/pkg/apis/v1beta1"
 	"github.com/kopilote/castopod-operator/pkg/controllerutils"
+	"github.com/kopilote/castopod-operator/pkg/typeutils"
 	. "github.com/kopilote/castopod-operator/pkg/typeutils"
 	pkgError "github.com/pkg/errors"
 	appsv1 "k8s.io/api/apps/v1"
@@ -34,14 +33,20 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/utils/pointer"
 	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/builder"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
+	"sigs.k8s.io/controller-runtime/pkg/handler"
 	"sigs.k8s.io/controller-runtime/pkg/log"
+	"sigs.k8s.io/controller-runtime/pkg/predicate"
+	"sigs.k8s.io/controller-runtime/pkg/reconcile"
+	"sigs.k8s.io/controller-runtime/pkg/source"
 )
 
 // CastopodMutator reconciles a Castopod object
@@ -126,7 +131,7 @@ func (r *CastopodMutator) Mutate(ctx context.Context, app *v1beta1.Castopod) (*c
 	}
 	_, err = r.reconcileIngressForCDN(ctx, appConfig, castopodService)
 	if err != nil {
-		return controllerutils.Requeue(), pkgError.Wrap(err, "Reconciling ingress for Castopod")
+		return controllerutils.Requeue(), pkgError.Wrap(err, "Reconciling CDN ingress for Castopod")
 	}
 
 	// TODO: Send Webhooks when Castopod is ready
@@ -163,10 +168,9 @@ func generateEnv(config config) []corev1.EnvVar {
 		apisv1beta1.Env("CP_ANALYTICS_SALT", b64.StdEncoding.EncodeToString([]byte(config.App.Name))),
 		apisv1beta1.Env("CP_DATABASE_NAME", fmt.Sprintf("castopod_%s", config.App.Name)),
 		// URL
-		apisv1beta1.Env("CP_LEGALNOTICE_BASEURL", fmt.Sprintf("https://%s", config.App.Spec.Config.URL.LegalNotice)),
+		apisv1beta1.Env("app_legalNoticeURL", fmt.Sprintf("https://%s", config.App.Spec.Config.URL.LegalNotice)),
 		// Limit
-		apisv1beta1.Env("CP_LIMIT_STORAGE", fmt.Sprintf("%s", config.App.Spec.Config.Limit.Storage)),
-		apisv1beta1.Env("CP_LIMIT_BANDWIDTH", fmt.Sprintf("%s", config.App.Spec.Config.Limit.Bandwidth)),
+		apisv1beta1.Env("app_storageLimit", fmt.Sprintf("%s", config.App.Spec.Config.Limit.Storage)),
 	}
 	env = append(env, config.Configuration.Spec.Mysql.Env("")...)
 	return env
@@ -221,25 +225,6 @@ func (r *CastopodMutator) reconcileDeploymentForApp(ctx context.Context, config 
 								ContainerPort: 8000,
 							}},
 							LivenessProbe: controllerutils.DefaultLiveness(),
-							Resources: corev1.ResourceRequirements{
-								Requests: corev1.ResourceList{
-									corev1.ResourceCPU:    *resource.NewMilliQuantity(100, resource.DecimalSI),
-									corev1.ResourceMemory: *resource.NewMilliQuantity(256, resource.DecimalSI),
-								},
-							},
-						},
-					},
-					InitContainers: []corev1.Container{
-						{
-							Name:            "init-create-db",
-							Image:           "mysql:8.0.31",
-							ImagePullPolicy: corev1.PullIfNotPresent,
-							Command: []string{
-								"sh",
-								"-c",
-								`mysql -h ${CP_DATABASE_HOSTNAME} -P ${CP_DATABASE_PORT} -u ${CP_DATABASE_USERNAME} -p${CP_DATABASE_PASSWORD} -e "CREATE DATABASE IF NOT EXISTS ${CP_DATABASE_NAME};"`,
-							},
-							Env: generateEnv(*config),
 							Resources: corev1.ResourceRequirements{
 								Requests: corev1.ResourceList{
 									corev1.ResourceCPU:    *resource.NewMilliQuantity(100, resource.DecimalSI),
@@ -400,40 +385,47 @@ func (r *CastopodMutator) reconcileIngressForCDN(ctx context.Context, config *co
 	return ret, nil
 }
 
-func (r *CastopodMutator) reconcileCertificate(ctx context.Context, config *config) (*certmanager.Certificate, error) {
-	ret, operationResult, err := controllerutils.CreateOrUpdateWithController(ctx, r.Client, r.Scheme, types.NamespacedName{
-		Namespace: config.App.Namespace,
-		Name:      config.App.Name,
-	}, config.App, func(certificate *certmanager.Certificate) error {
-		certificate.Spec = certmanager.CertificateSpec{
-			DNSNames:   []string{config.App.Spec.Config.URL.Base},
-			SecretName: config.App.Name,
-			IssuerRef: cmmeta.ObjectReference{
-				Name: "dns-letsencrypt-prod",
-				Kind: "Issuer",
-			},
+func watch(mgr ctrl.Manager, field string) handler.EventHandler {
+	return handler.EnqueueRequestsFromMapFunc(func(object client.Object) []reconcile.Request {
+		stacks := &v1beta1.CastopodList{}
+		listOps := &client.ListOptions{
+			FieldSelector: fields.OneTermEqualSelector(field, object.GetName()),
+			Namespace:     object.GetNamespace(),
 		}
-		return nil
+		err := mgr.GetClient().List(context.TODO(), stacks, listOps)
+		if err != nil {
+			return []reconcile.Request{}
+		}
+
+		return typeutils.Map(stacks.Items, func(s v1beta1.Castopod) reconcile.Request {
+			return reconcile.Request{
+				NamespacedName: types.NamespacedName{
+					Name:      s.GetName(),
+					Namespace: s.GetNamespace(),
+				},
+			}
+		})
 	})
-	switch {
-	case err != nil:
-		apisv1beta1.SetCertificateError(config.App, err.Error())
-		return nil, err
-	case operationResult == controllerutil.OperationResultNone:
-	default:
-		apisv1beta1.SetCertificateReady(config.App)
-	}
-	return ret, nil
 }
 
 // SetupWithBuilder SetupWithManager sets up the controller with the Manager.
-func (r *CastopodMutator) SetupWithBuilder(mgr ctrl.Manager, builder *ctrl.Builder) error {
-	builder.
-		Owns(&v1beta1.Configuration{}).
-		Owns(&v1beta1.Version{}).
+func (r *CastopodMutator) SetupWithBuilder(mgr ctrl.Manager, bldr *ctrl.Builder) error {
+	bldr.
+		Owns(&v1beta1.Castopod{}).
+		Owns(&corev1.Namespace{}).
 		Owns(&appsv1.Deployment{}).
 		Owns(&corev1.Service{}).
-		Owns(&networkingv1.Ingress{})
+		Owns(&networkingv1.Ingress{}).
+		Watches(
+			&source.Kind{Type: &v1beta1.Configuration{}},
+			watch(mgr, ".spec.configurationSpec"),
+			builder.WithPredicates(predicate.ResourceVersionChangedPredicate{}),
+		).
+		Watches(
+			&source.Kind{Type: &v1beta1.Version{}},
+			watch(mgr, ".spec.versionSpec"),
+			builder.WithPredicates(predicate.ResourceVersionChangedPredicate{}),
+		)
 	return nil
 }
 

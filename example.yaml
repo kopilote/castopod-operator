@@ -3,21 +3,41 @@ kind: Configuration
 metadata:
   name: default
 spec:
-  mysql:
-    host: mysql.deps.svc
-    port: 3306
-    username: root
-    password: secretpassword
   ingress:
     annotations:
+      cert-manager.io/cluster-issuer: dns-letsencrypt-prod
       traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
+  media:
+    bucket: castopod-content
+    endpoint: https://s3.fr-par.scw.cloud
+    key: SCWDMX31ZKQ71XQ9QNEE
+    region: fr-par
+    secret: 6a8ccf6c-c904-46a5-a853-1a8b3c737932
+  mysql:
+    host: 51.159.26.243
+    password: 642rcZFn6UHM4dkzL5@
+    port: '8001'
+    username: castopod
+  smtp:
+    from: no-reply@castopod.com
+    host: mail.adaures.com
+    password: '%H%kdqZLV%vzsD%!W#wD^zeGH46vrY6a'
+    port: '587'
+    username: no-reply@castopod.com
 ---
 apiVersion: castopod.kopilote.io/v1beta1
 kind: Version
 metadata:
   name: default
 spec:
-  imageTag: 1.1.1
+  imageTag: 1.3.2
+---
+apiVersion: castopod.kopilote.io/v1beta1
+kind: Version
+metadata:
+  name: default2
+spec:
+  imageTag: 1.3.2
 ---
 apiVersion: castopod.kopilote.io/v1beta1
 kind: Castopod
@@ -25,8 +45,7 @@ metadata:
   name: example
 spec:
   configurationSpec: default
-  versionSpec: default
-
+  versionSpec: default2
   activated: false
   config:
     url:
@@ -35,7 +54,6 @@ spec:
       legalNotice: castopod.192.168.1.3.nip.io
     limit:
       storage: "100"
-      bandwidth: "100"
     gateway:
       admin: /admin
       auth: /auth
