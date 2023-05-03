@@ -168,7 +168,7 @@ func generateEnv(config config) []corev1.EnvVar {
 		apisv1beta1.Env("CP_ANALYTICS_SALT", b64.StdEncoding.EncodeToString([]byte(config.App.Name))),
 		apisv1beta1.Env("CP_DATABASE_NAME", fmt.Sprintf("castopod_%s", config.App.Name)),
 		// URL
-		apisv1beta1.Env("app_legalNoticeURL", fmt.Sprintf("https://%s", config.App.Spec.Config.URL.LegalNotice)),
+		apisv1beta1.Env("app_legalNoticeURL", config.App.Spec.Config.URL.LegalNotice),
 		// Limit
 		apisv1beta1.Env("app_storageLimit", fmt.Sprintf("%s", config.App.Spec.Config.Limit.Storage)),
 	}
@@ -225,6 +225,25 @@ func (r *CastopodMutator) reconcileDeploymentForApp(ctx context.Context, config 
 								ContainerPort: 8000,
 							}},
 							LivenessProbe: controllerutils.DefaultLiveness(),
+							Resources: corev1.ResourceRequirements{
+								Requests: corev1.ResourceList{
+									corev1.ResourceCPU:    *resource.NewMilliQuantity(100, resource.DecimalSI),
+									corev1.ResourceMemory: *resource.NewMilliQuantity(256, resource.DecimalSI),
+								},
+							},
+						},
+					},
+					InitContainers: []corev1.Container{
+						{
+							Name:            "init-create-db",
+							Image:           "mysql:8.0.31",
+							ImagePullPolicy: corev1.PullIfNotPresent,
+							Command: []string{
+								"sh",
+								"-c",
+								`mysql -h ${CP_DATABASE_HOSTNAME} -P ${CP_DATABASE_PORT} -u ${CP_DATABASE_USERNAME} -p${CP_DATABASE_PASSWORD} -e "CREATE DATABASE IF NOT EXISTS ${CP_DATABASE_NAME};"`,
+							},
+							Env: generateEnv(*config),
 							Resources: corev1.ResourceRequirements{
 								Requests: corev1.ResourceList{
 									corev1.ResourceCPU:    *resource.NewMilliQuantity(100, resource.DecimalSI),
