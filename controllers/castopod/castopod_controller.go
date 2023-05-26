@@ -24,7 +24,7 @@ import (
 	"github.com/kopilote/castopod-operator/apis/castopod/v1beta1"
 	apisv1beta1 "github.com/kopilote/castopod-operator/pkg/apis/v1beta1"
 	"github.com/kopilote/castopod-operator/pkg/controllerutils"
-	"github.com/kopilote/castopod-operator/pkg/typeutils"
+	. "github.com/kopilote/castopod-operator/pkg/typeutils"
 	pkgError "github.com/pkg/errors"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -415,7 +415,7 @@ func watch(mgr ctrl.Manager, field string) handler.EventHandler {
 			return []reconcile.Request{}
 		}
 
-		return typeutils.Map(stacks.Items, func(s v1beta1.Castopod) reconcile.Request {
+		return Map(stacks.Items, func(s v1beta1.Castopod) reconcile.Request {
 			return reconcile.Request{
 				NamespacedName: types.NamespacedName{
 					Name:      s.GetName(),
