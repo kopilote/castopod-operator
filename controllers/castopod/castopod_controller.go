@@ -25,7 +25,6 @@ import (
 	apisv1beta1 "github.com/kopilote/castopod-operator/pkg/apis/v1beta1"
 	"github.com/kopilote/castopod-operator/pkg/controllerutils"
 	"github.com/kopilote/castopod-operator/pkg/typeutils"
-	. "github.com/kopilote/castopod-operator/pkg/typeutils"
 	pkgError "github.com/pkg/errors"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
@@ -158,11 +157,11 @@ func generateEnv(config config) []corev1.EnvVar {
 		apisv1beta1.Env("media_s3_keyPrefix", config.App.Name),
 
 		// Config for SMTP
-		apisv1beta1.Env("email_fromEmail", config.Configuration.Spec.Smtp.From),
-		apisv1beta1.Env("email_SMTPHost", config.Configuration.Spec.Smtp.Host),
-		apisv1beta1.Env("email_SMTPPort", config.Configuration.Spec.Smtp.Port),
-		apisv1beta1.Env("email_SMTPUser", config.Configuration.Spec.Smtp.Username),
-		apisv1beta1.Env("email_SMTPPass", config.Configuration.Spec.Smtp.Password),
+		apisv1beta1.Env("CP_EMAIL_FROM", config.Configuration.Spec.Smtp.From),
+		apisv1beta1.Env("CP_EMAIL_SMTP_HOST", config.Configuration.Spec.Smtp.Host),
+		apisv1beta1.Env("CP_EMAIL_SMTP_PORT", config.Configuration.Spec.Smtp.Port),
+		apisv1beta1.Env("CP_EMAIL_SMTP_USERNAME", config.Configuration.Spec.Smtp.Username),
+		apisv1beta1.Env("CP_EMAIL_SMTP_PASSWORD", config.Configuration.Spec.Smtp.Password),
 
 		apisv1beta1.Env("CP_CACHE_HANDLER", "file"),
 		apisv1beta1.Env("CP_ANALYTICS_SALT", b64.StdEncoding.EncodeToString([]byte(config.App.Name))),
