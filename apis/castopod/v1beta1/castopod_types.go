@@ -29,7 +29,7 @@ type CastopodSpec struct {
 	//+required
 	ConfigurationSpec string `json:"configurationSpec,omitempty"`
 	//+required
-	VersionSpec string `json:"versionSpec,omitempty"`
+	Version string `json:"version,omitempty"`
 	//+required
 	Activated bool `json:"activated"`
 	//+optional

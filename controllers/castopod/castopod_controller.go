@@ -71,7 +71,6 @@ type CastopodMutator struct {
 type config struct {
 	App           *v1beta1.Castopod
 	Configuration *v1beta1.Configuration
-	Version       *v1beta1.Version
 }
 
 func (r *CastopodMutator) Mutate(ctx context.Context, app *v1beta1.Castopod) (*ctrl.Result, error) {
@@ -88,22 +87,10 @@ func (r *CastopodMutator) Mutate(ctx context.Context, app *v1beta1.Castopod) (*c
 		return controllerutils.Requeue(), fmt.Errorf("error retrieving Configuration object: %s", err)
 	}
 
-	// Get Version Object
-	version := &v1beta1.Version{}
-	if err := r.Client.Get(ctx, types.NamespacedName{
-		Name: app.Spec.VersionSpec,
-	}, version); err != nil {
-		if errors.IsNotFound(err) {
-			return nil, pkgError.New("Version object not found")
-		}
-		return controllerutils.Requeue(), fmt.Errorf("error retrieving Version object: %s", err)
-	}
-
 	// Create config Object
 	appConfig := &config{
 		App:           app,
 		Configuration: configuration,
-		Version:       version,
 	}
 
 	// Create Namespace
@@ -133,7 +120,6 @@ func (r *CastopodMutator) Mutate(ctx context.Context, app *v1beta1.Castopod) (*c
 		return controllerutils.Requeue(), pkgError.Wrap(err, "Reconciling CDN ingress for Castopod")
 	}
 
-	// TODO: Send Webhooks when Castopod is ready
 	apisv1beta1.SetReady(app)
 	return nil, nil
 
@@ -216,7 +202,7 @@ func (r *CastopodMutator) reconcileDeploymentForApp(ctx context.Context, config 
 					Containers: []corev1.Container{
 						{
 							Name:            "web",
-							Image:           fmt.Sprintf("castopod/castopod:%s", config.Version.Spec.ImageTag),
+							Image:           fmt.Sprintf("castopod/castopod:%s", config.App.Spec.Version),
 							ImagePullPolicy: corev1.PullIfNotPresent,
 							Env:             generateEnv(*config),
 							Ports: []corev1.ContainerPort{{
@@ -437,11 +423,6 @@ func (r *CastopodMutator) SetupWithBuilder(mgr ctrl.Manager, bldr *ctrl.Builder)
 		Watches(
 			&source.Kind{Type: &v1beta1.Configuration{}},
 			watch(mgr, ".spec.configurationSpec"),
-			builder.WithPredicates(predicate.ResourceVersionChangedPredicate{}),
-		).
-		Watches(
-			&source.Kind{Type: &v1beta1.Version{}},
-			watch(mgr, ".spec.versionSpec"),
 			builder.WithPredicates(predicate.ResourceVersionChangedPredicate{}),
 		)
 	return nil

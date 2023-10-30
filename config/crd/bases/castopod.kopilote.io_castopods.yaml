@@ -78,7 +78,7 @@ spec:
                 type: object
               configurationSpec:
                 type: string
-              versionSpec:
+              version:
                 type: string
             required:
             - activated
