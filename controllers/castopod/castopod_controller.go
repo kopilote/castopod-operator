@@ -221,7 +221,7 @@ func (r *CastopodMutator) reconcileDeploymentForApp(ctx context.Context, config 
 							Env:             generateEnv(*config),
 							Ports: []corev1.ContainerPort{{
 								Name:          "http",
-								ContainerPort: 8000,
+								ContainerPort: 8080,
 							}},
 							LivenessProbe: controllerutils.DefaultLiveness(),
 							Resources: corev1.ResourceRequirements{
